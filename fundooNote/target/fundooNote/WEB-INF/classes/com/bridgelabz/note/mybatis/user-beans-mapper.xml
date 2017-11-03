@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace="com.bridgelabz.note.dao.UserDao">
+
+	<select id="loginUser" parameterType="Login" resultType="User">
+		SELECT
+		user_id as userId,
+		email,
+		full_name as fullName,
+		mob_num as mobileNumber
+		FROM User
+		WHERE email=
+		#{email} AND passd =
+		#{password};
+	</select>
+	<insert id="register" parameterType="User" useGeneratedKeys="true"
+		keyProperty="userId">
+		INSERT INTO
+		User(full_name,mob_num,email,passd)
+		VALUES(#{fullName},#{mobileNumber},#{email}, #{password})
+	</insert>
+
+	<select id="getUserByEmailID" parameterType="String" resultType="User">
+		SELECT user_id as userId,
+		email,
+		full_name as fullName,
+		passd as
+		password,
+		mob_num as mobileNumber
+		FROM
+		User
+		WHERE
+		email = #{email}
+	</select>
+
+	<update id="changePass" parameterType="User">
+		UPDATE User
+		SET passd =
+		#{password}
+		WHERE user_id = #{id};
+	</update>
+</mapper>
