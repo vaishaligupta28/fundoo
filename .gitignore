@@ -1,0 +1,13 @@
+*.o
+*.h
+*.exe
+.settings
+.project
+.classpath
+.pmd
+.ruleset
+target
+data
+.metadata
+bin
+doc
