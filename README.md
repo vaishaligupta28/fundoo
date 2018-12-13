@@ -4,7 +4,7 @@ This is a small implementation of Google Keep/Notes as a reference to learn and 
 
 ## Technolgies/Frameworks implemented are:
 
-Spring MVC
+Spring MVC  
 
 Apache maven
 
