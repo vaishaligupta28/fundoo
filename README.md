@@ -10,7 +10,7 @@ Apache maven
 
 MyBatis ORM
   
-Oauth2 for token authentication
+Oauth2 for token authentication  
 
 Embedded fb/gmail/linkedin login
 
