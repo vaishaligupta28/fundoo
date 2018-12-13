@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace="com.bridgelabz.note.dao.NoteDao">
+
+	<insert id="insertNote" parameterType="Note">
+		<selectKey keyProperty="noteId" resultType="int" order="AFTER">
+			SELECT LAST_INSERT_ID() as noteId
+		</selectKey>
+		INSERT INTO
+		Note(created_on,
+		title, description, user_id)
+		VALUES(#{createdOn},#{title}, #{desc},#{user.userId})
+	</insert>
+
+	<update id="updateNote" parameterType="Note" useGeneratedKeys="true"
+		keyProperty="noteId">
+		UPDATE Note
+		SET title = #{title},description = #{desc},
+		created_on = #{createdOn}
+		WHERE note_id = #{noteId}
+	</update>
+
+	<select id="getNoteById" parameterType="int" resultMap="noteMap">
+		SELECT
+		note_id,title, created_on,description FROM Note WHERE note_id =
+		#{noteId}
+	</select>
+
+
+	<resultMap id="noteMap" type="Note">
+		<id column="note_id" property="noteId" />
+		<result column="title" property="title" />
+		<result column="description" property="desc" />
+		<result column="created_on" property="createdOn" />
+		<association javaType="User" property="user" column="user_id"
+			select="selectUserFromNote">
+
+			<id property="userId" column="user_id"></id>
+		</association>
+	</resultMap>
+
+	<select id="listAllNotes" resultMap="noteMap" parameterType="int">
+		SELECT * FROM Note WHERE user_id = #{userId}
+		UNION SELECT * FROM Note
+		WHERE note_id IN(SELECT note_id FROM Collaborator
+		WHERE
+		shared_to_id=#{user_id})
+
+	</select>
+
+	<select id="selectUserFromNote" parameterType="int" resultType="User">
+		SELECT user_id as userId, full_name as fullName, mob_num as mobileNum,
+		email FROM User WHERE user_id = #{userId}
+	</select>
+
+	<parameterMap type="java.util.Map" id="map">
+		<parameter property="userId" />
+		<parameter property="noteId" />
+	</parameterMap>
+
+	<update id="deleteNoteById" parameterMap="map">
+		DELETE FROM Note WHERE
+		user_id = #{userId} and note_id = #{noteId}
+	</update>
+
+	<update id="tempDeleteNote" parameterType="Note">
+		UPDATE Note
+		SET
+		trash =
+		#{sentInTrash}
+		WHERE note_id = #{noteId}
+	</update>
+
+	<update id="archiveNote" parameterType="Note">
+		UPDATE Note
+		SET
+		archive =
+		#{archived}
+		WHERE note_id = #{noteId}
+	</update>
+
+	<update id="pinNote" parameterType="Note">
+		UPDATE Note
+		SET
+		pinned =
+		#{pinned}
+		WHERE note_id = #{noteId}
+	</update>
+	<update id="setReminder" parameterType="Note">
+		UPDATE Note
+		SET
+		reminder =
+		#{reminderTime} WHERE note_id = #{noteId}
+	</update>
+
+	<!-- <resultMap id="noteMap" type="Note"> <id column="note_id" property="noteId" 
+		/> <result column="title" property="title" /> <result column="description" 
+		property="desc" /> <result column="created_on" property="createdOn" /> </resultMap> 
+		<select id="getNotifications" resultType="" parameterType="int"> SELECT * 
+		FROM Note WHERE user_id = #{userId} </select> -->
+
+
+	<insert id="addCollab" parameterType="Collab">
+		INSERT INTO
+		Collaborator(note_id, shared_to_id,shared_from_id)
+		VALUES(#{noteId},#{shared_to_id},#{shared_from_id})
+	</insert>
+
+	<resultMap id="collabMap" type="Collab">
+		<id column="collab_id" property="collabId" />
+		<id column="note_id" property="noteId" />
+		<id column="shared_from_id" property="shared_from_id" />
+		<id column="shared_to_id" property="shared_to_id" />
+	</resultMap>
+	<select id="getCollabsFromNote" resultMap="collabMap"
+		parameterType="int">
+		SELECT
+		*
+		FROM
+		Collaborator
+		WHERE note_id = #{noteId}
+	</select>
+	<update id="unCollab">
+		DELETE FROM Collab WHERE
+		shared_to_id = #{userId} and note_id = #{noteId}
+	</update>
+</mapper>
